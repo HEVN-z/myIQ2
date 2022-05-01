@@ -1,3 +1,4 @@
 *.env
 *.lua
+/__pycache__
 /json
