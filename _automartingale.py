@@ -1,7 +1,7 @@
 import tkinter as tk
 import random
 import _autojson as jsn
-import _automonitoring as mon
+#import _automonitoring as mon
 
 g = tk.Tk()
 g.title("RANDOM")
@@ -32,8 +32,8 @@ def set_amount():
     except:
         lb_amount.configure(text="Incorrect amount")
 
-def show_gui2():
-    mon.gui2.mainloop()
+#def show_gui2():
+#    mon.gui2.mainloop()
     
 en_amount = tk.Entry(master=g, width=15)
 en_amount.pack(pady=10)
@@ -50,7 +50,7 @@ lb_random.pack()
 lb_amount = tk.Label(master = g, width=15, height=1,text = str(jsn.get_amount()))
 lb_amount.pack(pady=15)
 
-bt_monitoring = tk.Button(master = g, width=15, height=1, text="Monitoring", command=show_gui2)
-bt_monitoring.pack()
+#bt_monitoring = tk.Button(master = g, width=15, height=1, text="Monitoring", command=show_gui2)
+#bt_monitoring.pack()
 
 g.mainloop()
