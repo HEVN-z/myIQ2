@@ -43,7 +43,5 @@ except:
 w = open("_json.json", "w")
 json.dump(dict1, w, indent=4)
 
-
-
 print(r['emp2'])
 #while True:
