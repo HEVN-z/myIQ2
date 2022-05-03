@@ -11,10 +11,12 @@ def set_lb():
 
 
 master = Tk()
+master.title("IQOption_Autobot")
 #master.state('zoomed')
 master.resizable(0,0)
 master.geometry("400x400")
-master.attributes("-topmost", True)
+#master.attributes("-topmost", True)
+master.attributes("-fullscreen", True)
 t_checker = False
 
 def new_win():
@@ -41,5 +43,8 @@ bt.pack()
 
 lb = Label(master, text="This is label")
 lb.pack()
+
+bt_close = Button(master, text="Close", command=master.destroy)
+bt_close.pack()
 
 mainloop()

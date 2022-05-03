@@ -18,11 +18,14 @@ while True:
         print("Failed to connect")
         break
 #print(bot.get_candles("EURUSD",60,1,time.time()))
-bot.start_candles_stream("EURUSD",60,1)
+
+print(bot.get_balance_v2())
+
+'''bot.start_candles_stream("EURUSD",60,1,time.time())
 while True:
     #print(bot.get_candles("EURUSD",60,1,time.time()))
     print(bot.get_realtime_candles("EURUSD",60))
-    time.sleep(.2)
+    time.sleep(.2)'''
 
 '''print(bot.get_balance(),bot.get_currency())
 print(bot.get_balance_mode())
