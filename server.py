@@ -15,6 +15,7 @@ while True:
     print(bot.get_balance_mode())
     print(bot.get_balance_id())
     time.sleep(1)
+
 '''
 
 while True:
