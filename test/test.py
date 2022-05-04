@@ -44,7 +44,7 @@ print(bot.get_balance_mode())'''
 country="TH"
 from_position=1
 to_position=10000
-near_traders_count=0
+near_traders_count=10000
 
 print(bot.get_leader_board(country,from_position,to_position,near_traders_count))
 
