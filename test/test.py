@@ -18,8 +18,12 @@ while True:
         print("Failed to connect")
         break
 #print(bot.get_candles("EURUSD",60,1,time.time()))
-
-print(bot.get_balance_v2())
+'''ACTIVES="EURUSD"
+duration=1
+bot.subscribe_strike_list(ACTIVES,duration)
+print(bot.get_all_profit()["EURUSD"]["turbo"])
+print(bot.get_digital_current_profit(ACTIVES, duration))
+bot.unsubscribe_strike_list(ACTIVES,duration)'''
 
 '''bot.start_candles_stream("EURUSD",60,1,time.time())
 while True:
@@ -37,9 +41,10 @@ print(bot.get_balance(),bot.get_currency())
 print(bot.get_balance_mode())'''
 
 
-'''country="TH"
+country="TH"
 from_position=1
 to_position=10000
 near_traders_count=0
 
-print(bot.get_leader_board(country,from_position,to_position,near_traders_count))'''
+print(bot.get_leader_board(country,from_position,to_position,near_traders_count))
+
