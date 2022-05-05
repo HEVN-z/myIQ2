@@ -1,7 +1,8 @@
 *.env
 *.lua
 /__pycache__
-/json
 /client
+/json
+/logic
 /server
 /temp
