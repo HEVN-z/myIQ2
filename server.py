@@ -15,39 +15,3 @@ while True:
     print(bot.get_balance_mode())
     print(bot.get_balance_id())
     time.sleep(1)
-
-'''
-
-while True:
-    if bot.connect():
-        print("Connected")
-        break
-    else:
-        print("Failed to connect")
-
-print("I am Online!")
-'''
-dict1 ={
-    "emp1": {
-        "name": "Lisa",
-        "designation": "programmer",
-        "age": "34",
-        "salary": "54000"
-    },
-    "emp2": {
-        "name": "Elis",
-        "designation": "Trainee",
-        "age": "24",
-        "salary": "40000"
-    }
-}
-dict1['emp3'] = {'name':"HEVNz"}
-try:
-    r = json.load(open("_json.json"))
-except:
-    pass
-w = open("_json.json", "w")
-json.dump(dict1, w, indent=4)
-
-print(r['emp2'])
-#while True:
