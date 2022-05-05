@@ -1,0 +1,13 @@
+import numpy as np
+a = np.arange(15).reshape(3,5)
+print(a)
+print(a.shape)
+print(a.ndim)
+print(a.dtype)
+print(a.itemsize)
+print(type(a))
+print(a.size)
+print(a.nbytes)
+b = np.array([4,5,6])
+print(b)
+print(type(b))
