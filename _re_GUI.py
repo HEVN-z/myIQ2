@@ -1,15 +1,32 @@
-import reRun as r
+import _re_Run as r
 from threading import Thread
 from tkinter import *
 
+def p(text):
+        print(text)
+p("\nLoading ... 1")
+bot = r.bot = r.IQ_Option(r.email,r.password)
+def connect():
+        bot.connect()
+        try:
+                bot.get_balance()
+                p("Connected")
+        except:
+                p("Try again")
+C = Thread(target=connect)
 R = Thread(target=r.run)
 
 
+def getballance():
+        p(bot.get_balance())
+
+p("\nLoading ... 2")
 def start():
         R.start()
 
 def stop():
-        R.raise_exception()
+        R.stop()
+p("\nLoading ... 3")
 root = Tk()
 root.title("IQ Autobot")
 root.resizable(0,0)
@@ -28,10 +45,10 @@ root.geometry("%dx%d+%d+%d" % (
         y_center-h_center))
 root.attributes("-topmost", True)
 
-bt_Stop = Button(root, text="Stop", command = stop)
+bt_Stop = Button(root, text="Stop", command = getballance)
 bt_Stop.place(relx=0.7, rely=0.7, anchor=CENTER)
 
-bt_start = Button(root, text="Start", command = start)
+bt_start = Button(root, text="Connect", command = connect)
 bt_start.place(relx=0.5, rely=0.5, anchor=CENTER)
-
+p("\nLoading ... 4")
 root.mainloop()
