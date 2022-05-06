@@ -1,14 +1,27 @@
 from iqoptionapi.stable_api import IQ_Option
 import time
-import json
-J = json.load(open("_reJSON_UID.json"))
+import numpy as np
+import numba as nb
 
-email = J['username']
-password = J['password']
+import _reJson_UID as J
+
+email = J.get_email()
+password = J.get_password()
 
 bot = IQ_Option(email,password)
 
+def refresh_login():
+    global bot
+    email = J.get_email()
+    password = J.get_password()
+    bot = IQ_Option(email,password)
+    bot.connect()
+
 def run():
-    for i in range(1):
-        print("Running...")
-        time.sleep(1)
+    while True:
+        begin = time.time()
+        bot.get_technical_indicators('EURUSD')
+        print('latency = ',round(1000*(time.time()-begin)))
+        begin = time.time()
+        np.array([bot.get_technical_indicators('EURUSD')])
+        print('\t\t\tnp latency = ',round(1000*(time.time()-begin)))
