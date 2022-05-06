@@ -1,8 +1,20 @@
+############################################################################################
+## Import packages
+############################################################################################
+
 import json
 import time
 
+
+############################################################################################
+## Load files
+############################################################################################
+
 json_file = json.load(open("_reJSON_UID.json"))
 
+###############################################################################################
+## Function
+###############################################################################################
 
 def get_email():
     json_file = json.load(open("_reJSON_UID.json"))
@@ -12,6 +24,16 @@ def get_password():
     json_file = json.load(open("_reJSON_UID.json"))
     return json_file["password"]
 
-'''def set_amount(newamount):
-    json_file["amount"] = newamount
-    json.dump(json_file, open("_reJSON_UID.json", "w"))'''
+
+############################################################################################
+## Write files
+############################################################################################
+
+def set_email(newemail):
+    json_file["email"] = newemail
+    json.dump(json_file, open("_reJSON_UID.json", "w"))
+
+def set_password(newpass):
+    json_file["password"] = newpass
+    json.dump(json_file, open("_reJSON_UID.json", "w"))
+
