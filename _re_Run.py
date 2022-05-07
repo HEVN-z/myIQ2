@@ -17,6 +17,8 @@ import _reJson_UID as J
 ## Global Variables
 ###############################################################################################
 
+App_still_running = True
+
 email = J.get_email()
 password = J.get_password()
 
@@ -34,10 +36,15 @@ def refresh_login():
     bot.connect()
 
 def run():
-    while True:
+    global App_still_running
+    while App_still_running:
         begin = time.time()
         bot.get_technical_indicators('EURUSD')
         print('latency = ',round(1000*(time.time()-begin)))
         begin = time.time()
         np.array([bot.get_technical_indicators('EURUSD')])
         print('\t\t\tnp latency = ',round(1000*(time.time()-begin)))
+
+def buying():
+    global bot
+    global App_still_running
