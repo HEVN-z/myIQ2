@@ -1,0 +1,6 @@
+Option1 1 Option2 0 
+Option1 0 Option2 0 
+Option1 1 Option2 0 
+Option1 0 Option2 0 
+Option1 1 Option2 0 
+Option1 0 Option2 0 
