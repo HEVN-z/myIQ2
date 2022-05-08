@@ -1,1 +1,0 @@
-frame2_go_fullscreen

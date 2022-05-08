@@ -62,3 +62,29 @@ def stop_auto_trade():
         time.sleep(5)
 def martingale():
     global win_lose_count
+
+def update_paired(pair,mode):
+    global bot
+
+def thread_if_remaining():
+    global App_still_running
+    global Auto_trade_is_running
+    bot.start_candles_stream("EURUSD", 60, 1)
+    before_to = 0
+    # while App_still_running:
+    #     c = bot.get_realtime_candles("EURUSD", 60)
+    #     new_to = c[list(c.keys())[-1]]['to']
+    #     if new_to != before_to:
+    #         before_to = new_to
+    #         J.set_remain_offset(bot.get_remaning(1)-30)
+    #     # if bot.get_remaning(1) == 80:
+    All = bot.get_all_open_time()
+    # All_turbo = [i for i in All['turbo'] 
+    #             if i['open'] == True]
+    for x in All['binary']:
+        print(x + ' is ' +x['open'])
+    for i in All['binary']:
+        pass
+                #print(i)
+    # print(All["turbo"])
+        # time.sleep(.2)

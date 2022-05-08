@@ -8,7 +8,7 @@ from tkinter import *
 from tkinter import messagebox
 import time
 
-from matplotlib.pyplot import text
+from matplotlib import pyplot as plt
 
 ############################################################################################
 ## Import files
@@ -31,6 +31,8 @@ isWin_auto_trade_config = False
 isWin_auto_mm_config = False
 isWin_trading_history = False
 
+time_remaining = 0
+
 ###############################################################################################
 ## Function
 ###############################################################################################
@@ -48,15 +50,9 @@ def connect():
                 print("Try again")
         try:
                 print(r.bot.get_balance())
-                #print(r.bot.get_balance_mode())
-                #r.bot.change_balance('REAL')
-                #print(r.bot.get_balance())
-                #print(r.bot.get_balance_mode())
-                #r.bot.change_balance('PRACTICE')
-                #print(r.bot.get_balance())
-                #print(r.bot.get_balance_mode())
-                thread_updateUI.start()
                 go_frame2()
+                thread_updateUI.start()
+                thread_remaining.start()
                 J.set_email_remember(en_email.get())
                 J.set_password_remember(en_password.get())
         except Exception as err:
@@ -88,6 +84,7 @@ def formal_number(number):
                 floor_number += remain_number
         return floor_number
 def get_updateUI():
+        global time_remaining
         try:
                 if r.bot.get_balance_mode() == 'REAL':
                         type = 'REAL'
@@ -98,9 +95,13 @@ def get_updateUI():
                         color = 'yellow'
                         ccolor = 'orange'
                 balance = r.bot.get_balance()
-                lb_currency.config(text=type+"\n"+r.bot.get_currency(),fg= ccolor)
-                lb_balance.configure(text =formal_number(balance),fg = color)
-                en_amount.configure(bg = color,disabledforeground=color)
+                # print(balance)
+                lb_currency.config(text = type+"\n"+r.bot.get_currency(),fg= ccolor)
+                lb_balance.configure(text = formal_number(balance),fg = color)
+                en_amount.configure(bg = color,disabledforeground = color)
+                time_remaining = r.bot.get_remaning(1)
+                lb_time_remaining['text'] = time_remaining- J.get_remain_offset()
+
         except Exception as err:
                 print(err)
 
@@ -108,7 +109,6 @@ def get_updateUI():
                 lb_auto_trade_running['text'] = "Running"
         else:
                 lb_auto_trade_running['text'] = ""
-        print(r.bot.get_balance())
 
 def get_updateUI_thread():  
         while App_still_running:
@@ -179,6 +179,7 @@ def on_closing():
 
 thread_running = Thread(target=r.run)
 thread_updateUI = Thread(target=get_updateUI_thread)
+thread_remaining = Thread(target=r.thread_if_remaining)
 
 ###############################################################################################
 ## UI config
@@ -400,16 +401,19 @@ if __name__ == "__main__":
         #root.config(menu=frame2_menubar)
 
         frame2_submenu = Menu(frame2_menubar, tearoff=0)
-        frame2_menubar.add_cascade(label="File", menu=frame2_submenu)
-        frame2_submenu.add_command(label="New", command=root.destroy)
-        frame2_submenu.add_command(label="Open", command=root.destroy)
-        frame2_submenu.add_command(label="Save", command=root.destroy)
+        frame2_menubar.add_cascade(label="Trade", menu=frame2_submenu)
+        frame2_submenu.add_command(label="Auto Trade Config", command = func_auto_trading_config)
+        frame2_submenu.add_command(label="Trading History", command=func_trading_history)
         frame2_submenu.add_separator()
         frame2_submenu.add_command(label="Exit", command=root.quit)
+
+        frame2_submenu2 = Menu(frame2_menubar, tearoff=0)
+        frame2_menubar.add_cascade(label="Trade", menu=frame2_submenu2)
+        frame2_submenu2.add_command(label="Auto MM Config", command = func_auto_mm_config)
         
 
         helpmenu = Menu(frame2_menubar, tearoff=0)
-        helpmenu.add_command(label="Help Index", command=root.destroy)
+        helpmenu.add_command(label="Help Index", command="root.destroy")
         helpmenu.add_command(label="About...", command=lambda:messagebox.showinfo("About", "IQ Autobot.\n\nIQ Autobot is robot trading from IQOption broker\n\n\tBeta version 0.001b"))
         frame2_menubar.add_cascade(label="Help", menu=helpmenu)
 
@@ -466,6 +470,18 @@ if __name__ == "__main__":
         font=("Helvetica", 18))
         bt_manual_sell.place(x=5,y=-5,relx=0,rely=1,anchor=SW)
 
+        lb_time_remaining = Label(frame2_trading_area,bg='white', text='30',font=("Arial", 18,'bold'),
+        width=2)
+        lb_time_remaining.place(y=5,relx=.35,rely=0,anchor=N)
+
+        frame2_currencypair_drop = OptionMenu(frame2_trading_area, currencypair_drop_Var, *currencypair_drop_list)
+        frame2_currencypair_drop.place(x=0,y=0,relx=.43,rely=.45,anchor=S)
+        frame2_currencypair_drop.config(bg='gray',font=("Helvetica", 10),activebackground='gray',
+        highlightbackground='gray',highlightthickness=1)
+
+        lb_get_profit = Label(frame2_trading_area,bg='gray', text='10%',font=("Arial", 28,'bold'),fg='lime',width=3)
+        lb_get_profit.place(x=0,y=0,relx=.43,rely=.48,anchor=N)
+
         cb_auto_trade_enable = Checkbutton(frame2_trading_area,bg='gray', text = "Auto Trade", command = auto_trade_enable,
         variable = cb_auto_trade_enable_Var,
         onvalue=1, offvalue=0,activebackground='gray',
@@ -478,10 +494,6 @@ if __name__ == "__main__":
         bt_trading_history = Button(frame2_trading_area,bg='gray', text = "Trading History", command = func_trading_history)
         bt_trading_history.place(x=-20,y=-10,relx=0.5,rely=1,anchor=S)
 
-        frame2_currencypair_drop = OptionMenu(frame2_trading_area, currencypair_drop_Var, *currencypair_drop_list)
-        frame2_currencypair_drop.place(x=0,y=0,relx=.43,rely=.65,anchor=S)
-        frame2_currencypair_drop.config(bg='gray',font=("Helvetica", 10),activebackground='gray',
-        highlightbackground='gray',highlightthickness=1)
 
         lb_auto_trade_running = Label(frame2_trading_area,bg='gray', text="Running", fg='lime',font=("Arial", 14),
         width=8)
@@ -524,7 +536,9 @@ if __name__ == "__main__":
         load_settings()
 
         root.bind_all("<Button-1>", lambda event: event.widget.focus_set())
+
         root.mainloop()
+
         print("\nLoading ... 5")
 
         ############################################################################################
