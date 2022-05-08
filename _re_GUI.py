@@ -8,6 +8,8 @@ from tkinter import *
 from tkinter import messagebox
 import time
 
+from matplotlib.pyplot import text
+
 ############################################################################################
 ## Import files
 ############################################################################################
@@ -24,6 +26,10 @@ print("\nLoading ... 1")
 App_still_running = True
 Trade_real = False
 isFullscreen = False
+
+isWin_auto_trade_config = False
+isWin_auto_mm_config = False
+isWin_trading_history = False
 
 ###############################################################################################
 ## Function
@@ -49,7 +55,7 @@ def connect():
                 #r.bot.change_balance('PRACTICE')
                 #print(r.bot.get_balance())
                 #print(r.bot.get_balance_mode())
-                thread_balance.start()
+                thread_updateUI.start()
                 go_frame2()
                 J.set_email_remember(en_email.get())
                 J.set_password_remember(en_password.get())
@@ -81,7 +87,7 @@ def formal_number(number):
                 remain_number = remain_number[1:]
                 floor_number += remain_number
         return floor_number
-def getbalance():
+def get_updateUI():
         try:
                 if r.bot.get_balance_mode() == 'REAL':
                         type = 'REAL'
@@ -97,20 +103,27 @@ def getbalance():
                 en_amount.configure(bg = color,disabledforeground=color)
         except Exception as err:
                 print(err)
+
+        if r.Auto_trade_is_running:
+                lb_auto_trade_running['text'] = "Running"
+        else:
+                lb_auto_trade_running['text'] = ""
         print(r.bot.get_balance())
-def getbalance_update():  
+
+def get_updateUI_thread():  
         while App_still_running:
-                getbalance()    # update balance
+                get_updateUI()      # update balance
                 time.sleep(1)
+
 def tradereal_toggle():
         global Trade_real
         Trade_real = not Trade_real
         if Trade_real:
                 r.bot.change_balance('REAL')
-                getbalance()
+                get_updateUI()
         else:
                 r.bot.change_balance('PRACTICE')
-                getbalance()
+                get_updateUI()
 
 print("\nLoading ... 2")
 def start():
@@ -127,7 +140,17 @@ print("\nLoading ... 3")
 def go_frame2():
         frame2.tkraise()
         #root.minsize(300,500)
-        root.geometry("300x500"+"+{}+{}".format(root.winfo_screenwidth()//2-150,root.winfo_screenheight()//2-250))
+        set_width = 300
+        set_height = 500
+        w_center = set_width/2
+        h_center = set_height/2
+        x_center = root.winfo_screenwidth()/2
+        y_center = root.winfo_screenheight()/2
+        root.geometry("%dx%d+%d+%d" % (
+                set_width,
+                set_height,
+                x_center+(w_center*3),
+                y_center-h_center))
         #root.resizable(1,1)
 def frame2_go_fullscreen():
         global isFullscreen
@@ -155,7 +178,7 @@ def on_closing():
 ###############################################################################################
 
 thread_running = Thread(target=r.run)
-thread_balance = Thread(target=getbalance)
+thread_updateUI = Thread(target=get_updateUI_thread)
 
 ###############################################################################################
 ## UI config
@@ -166,6 +189,7 @@ def auto_trade_enable():
                 J.set_auto_trade_enable(1)
                 bt_manual_buy['state'] = 'disabled'
                 bt_manual_sell['state'] = 'disabled'
+                r.Auto_trade_is_running = True
                 print("Auto trade enabled")
 
         elif J.get_auto_trade_enable() == 1:
@@ -173,6 +197,7 @@ def auto_trade_enable():
                 bt_manual_buy['state'] = 'normal'
                 bt_manual_sell['state'] = 'normal'
                 print("Auto trade disabled")
+                Thread(target=r.stop_auto_trade).start()
         else:
                 print("Error")
 
@@ -206,11 +231,74 @@ def auto_mm_enable_update():
                 en_amount['state'] = 'normal'
         else:
                 print("Error")
+
+def load_settings():
+        auto_mm_enable_update()
+        if cb_auto_mm_enable_Var.get() == 1:
+                cb_auto_mm_enable.select()
+
+        auto_trade_enable_update()
+        if J.get_auto_trade_enable() == 1:
+                cb_auto_trade_enable.select()
 ########################################################################################################################
 ## Create popup windows
 ########################################################################################################################
 
+def func_auto_trading_config():
+        def close():
+                global isWin_auto_trade_config
+                isWin_auto_trade_config = False
+                auto_trade_config_window.destroy()
+        global isWin_auto_trade_config
+        if isWin_auto_trade_config:
+                return
+        isWin_auto_trade_config = True
+        auto_trade_config_window = Toplevel(root)
+        auto_trade_config_window.title("Auto trading configuration")
+        auto_trade_config_window.focus()
+        auto_trade_config_window['bg'] = 'gray'
+        auto_trade_config_window.geometry("400x400"+"+{}+{}".format(root.winfo_screenwidth()//3-200,root.winfo_screenheight()//3-200))
+        auto_trade_config_window.transient(root)
+        auto_trade_config_window.wm_resizable(width=False, height=False)
+        auto_trade_config_window.bind("<Escape>", lambda event: close())
+        auto_trade_config_window.protocol("WM_DELETE_WINDOW", lambda : close())
+def func_auto_mm_config():
+        def close():
+                global isWin_auto_mm_config
+                isWin_auto_mm_config = False
+                auto_mm_config_window.destroy()
+        global isWin_auto_mm_config
+        if isWin_auto_mm_config:
+                return
+        isWin_auto_mm_config = True
+        auto_mm_config_window = Toplevel(root)
+        auto_mm_config_window.title("Auto money management configuration")
+        auto_mm_config_window.focus()
+        auto_mm_config_window['bg'] = 'gray'
+        auto_mm_config_window.geometry("400x400"+"+{}+{}".format(root.winfo_screenwidth()//3-200,root.winfo_screenheight()//3-200))
+        auto_mm_config_window.transient(root)
+        auto_mm_config_window.wm_resizable(width=False, height=False)
+        auto_mm_config_window.bind("<Escape>", lambda event: close())
+        auto_mm_config_window.protocol("WM_DELETE_WINDOW", lambda : close())
 
+def func_trading_history():
+        def close():
+                global isWin_trading_history
+                isWin_trading_history = False
+                trading_history_window.destroy()
+        global isWin_trading_history
+        if isWin_trading_history:
+                return
+        isWin_trading_history = True
+        trading_history_window = Toplevel(root)
+        trading_history_window.title("Trading History")
+        trading_history_window.focus()
+        trading_history_window['bg'] = 'gray'
+        trading_history_window.geometry("750x600"+"+{}+{}".format(root.winfo_screenwidth()//3-375,root.winfo_screenheight()//2-300))
+        trading_history_window.transient(root)
+        trading_history_window.wm_resizable(width=False, height=False)
+        trading_history_window.bind("<Escape>", lambda event: close())
+        trading_history_window.protocol("WM_DELETE_WINDOW", lambda : close())
 
 ########################################################################################################################
 ## Create a TKinter window
@@ -222,7 +310,7 @@ if __name__ == "__main__":
         root.resizable(0,0)
         root.winfo_width()/2
         root.winfo_height()/2
-        set_width = 250
+        set_width = 300
         set_height = 180
         w_center = set_width/2
         h_center = set_height/2
@@ -231,7 +319,7 @@ if __name__ == "__main__":
         root.geometry("%dx%d+%d+%d" % (
                 set_width,
                 set_height,
-                x_center-w_center,
+                x_center+(w_center*3),
                 y_center-h_center))
         root.attributes("-topmost", True)
         root.rowconfigure(0, weight=1)
@@ -288,6 +376,14 @@ if __name__ == "__main__":
         ## Frame 2
         # Create Variables
 
+        currencypair_drop_Var = StringVar()
+        currencypair_drop_list = [
+                "EUR/USD",
+                "EUR/JPY",
+                "USD/JPY",
+                "AUD/USD"
+        ]
+        currencypair_drop_Var.set(currencypair_drop_list[0])
         ##
         ## CB Variables
 
@@ -352,13 +448,13 @@ if __name__ == "__main__":
         bt_toggle_fullscreen = Button(frame2,bg='#ABB2B9',width=12, text = "Full View", command = frame2_go_fullscreen)
         bt_toggle_fullscreen.place(x=-8,y=100,relx=1, anchor=NE)
 
-        lb_debugging_text = Label(frame2,bg='#2E4053', text="Debugging text", fg='#3498DB',font=("Arial", 14,'bold'))
+        lb_debugging_text = Label(frame2,bg='#2E4053', text="Debugging text", fg='#3498DB',font=("Arial", 10,'bold'))
         lb_debugging_text.place(relx=1,rely=1,x=-5, y=-5, anchor=SE)
 
         ###############
         ## Trading Area
-        bt_image_higher = PhotoImage(file = "images/higher.png").subsample(1,1)
-        bt_image_lower = PhotoImage(file = "images/lower.png").subsample(1,1)
+        bt_image_higher = PhotoImage(file = "images/higher.png")
+        bt_image_lower = PhotoImage(file = "images/lower.png")
         bt_image_dim = 60
         bt_manual_buy = Button(frame2_trading_area,bg='lime', text = "Buy", command = 'manual_buy',
         width=bt_image_dim,height=bt_image_dim, image=bt_image_higher,
@@ -375,12 +471,33 @@ if __name__ == "__main__":
         onvalue=1, offvalue=0,activebackground='gray',
         width=15)
         cb_auto_trade_enable.place(x=-20,y=5,relx=1,rely=0,anchor=NE)
-        auto_trade_enable_update()
-        if J.get_auto_trade_enable() == 1:
-                cb_auto_trade_enable.select()
         
-        bt_auto_trade_config = Button(frame2_trading_area,bg='gray', text = "..", command = "auto_trade_config")
+        bt_auto_trade_config = Button(frame2_trading_area,bg='gray', text = "..", command = func_auto_trading_config)
         bt_auto_trade_config.place(x=-5,y=5,relx=1,rely=0,anchor=NE)
+
+        bt_trading_history = Button(frame2_trading_area,bg='gray', text = "Trading History", command = func_trading_history)
+        bt_trading_history.place(x=-20,y=-10,relx=0.5,rely=1,anchor=S)
+
+        frame2_currencypair_drop = OptionMenu(frame2_trading_area, currencypair_drop_Var, *currencypair_drop_list)
+        frame2_currencypair_drop.place(x=0,y=0,relx=.43,rely=.65,anchor=S)
+        frame2_currencypair_drop.config(bg='gray',font=("Helvetica", 10),activebackground='gray',
+        highlightbackground='gray',highlightthickness=1)
+
+        lb_auto_trade_running = Label(frame2_trading_area,bg='gray', text="Running", fg='lime',font=("Arial", 14),
+        width=8)
+        lb_auto_trade_running.place(x=-5,y=-100,relx=1,rely=1,anchor=SE)
+
+        lb_buy1 = Label(frame2_trading_area,bg='#2E4053', text="Buy 1", fg='#3498DB',font=("Arial", 14,'bold'),
+        width=8)
+        lb_buy1.place(x=-5,y=-65,relx=1,rely=1,anchor=SE)
+
+        lb_buy2 = Label(frame2_trading_area,bg='#2E4053', text="Buy 2", fg='#3498DB',font=("Arial", 14,'bold'),
+        width=8)
+        lb_buy2.place(x=-5,y=-35,relx=1,rely=1,anchor=SE)
+
+        lb_buy3 = Label(frame2_trading_area,bg='#2E4053', text="Buy 3", fg='#3498DB',font=("Arial", 14,'bold')
+        ,width=8)
+        lb_buy3.place(x=-5,y=-5,relx=1,rely=1,anchor=SE)
 
         ###############
         ## Money management area
@@ -394,11 +511,8 @@ if __name__ == "__main__":
         width=15,
         variable = cb_auto_mm_enable_Var)
         cb_auto_mm_enable.place(x=-20,y=5,relx=1,rely=0,anchor=NE)
-        auto_mm_enable_update()
-        if cb_auto_mm_enable_Var.get() == 1:
-                cb_auto_mm_enable.select()
         
-        bt_auto_mm_config = Button(frame2_mm_area,bg='gray', text = "..", command = "auto_mm_config")
+        bt_auto_mm_config = Button(frame2_mm_area,bg='gray', text = "..", command = func_auto_mm_config)
         bt_auto_mm_config.place(x=-5,y=5,relx=1,rely=0,anchor=NE)
 
         ############################################################################################
@@ -406,6 +520,8 @@ if __name__ == "__main__":
         
         print("\nLoading ... 4")
         frame1.tkraise()
+
+        load_settings()
 
         root.bind_all("<Button-1>", lambda event: event.widget.focus_set())
         root.mainloop()

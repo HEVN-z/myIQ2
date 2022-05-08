@@ -18,6 +18,8 @@ import JSON._reJson_UID as J
 ###############################################################################################
 
 App_still_running = True
+Auto_trade_is_running = False
+win_lose_count = 0
 
 email = J.get_email()
 password = J.get_password()
@@ -48,3 +50,15 @@ def run():
 def buying():
     global bot
     global App_still_running
+
+def stop_auto_trade():
+    global Auto_trade_is_running
+    global win_lose_count
+    while True:
+        if win_lose_count >= 0:
+            Auto_trade_is_running = False
+            print('Auto trade stopped')
+            break
+        time.sleep(5)
+def martingale():
+    global win_lose_count
