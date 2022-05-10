@@ -81,10 +81,10 @@ def thread_if_remaining():
     All = bot.get_all_open_time()
     # All_turbo = [i for i in All['turbo'] 
     #             if i['open'] == True]
-    for x in All['binary']:
-        print(x + ' is ' +x['open'])
-    for i in All['binary']:
-        pass
+    # for x in All['binary']:
+    #     print(x + ' is ' +x['open'])
+    # for i in All['binary']:
+    #     pass
                 #print(i)
     # print(All["turbo"])
         # time.sleep(.2)
